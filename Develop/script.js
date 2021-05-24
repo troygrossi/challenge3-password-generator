@@ -2,6 +2,7 @@
 
 // Get references to the #generate element
 var beginEl = document.querySelector("#generate");
+var passwordText = document.querySelector("#password");
 
 var criteriaLength = {
   divLengthEl: document.createElement("div"),
@@ -18,7 +19,6 @@ var criteriaLength = {
   },
 };
 criteriaLength.constructor();
-console.log(criteriaLength.divLengthEl);
 
 var criteriaCase = {
   divCaseEl: document.createElement("div"),
@@ -48,7 +48,6 @@ var criteriaCase = {
   },
 };
 criteriaCase.constructor();
-console.log(criteriaCase.divCaseEl);
 
 var criteriaCharacters = {
   divCharEl: document.createElement("div"),
@@ -86,7 +85,15 @@ var criteriaCharacters = {
   },
 };
 criteriaCharacters.constructor();
-console.log(criteriaCharacters.divCharEl);
+
+// container for criteria questions, displayed after begin is clicked
+var criteriaContainer = {
+  formContainerEl: document.createElement("div"),
+  constructor: function () {
+    this.formContainerEl.setAttribute("class", "criteria-container");
+  },
+};
+criteriaContainer.constructor();
 
 var passwordGenerator = {
   password: [],
@@ -99,7 +106,6 @@ var passwordGenerator = {
   ASCIIupper: [],
   ASCIIspread: [],
   index: 0,
-  option: 0,
   setValues: function () {
     this.inputLength = criteriaLength.inputLengthEl.value;
     this.lower = criteriaCase.inputLowerEl.checked;
@@ -182,40 +188,35 @@ var passwordGenerator = {
     }
   },
   generateSpecial: function (indexOne, indexTwo, indexThree, indexFour) {
-    var temp;
+    var rand;
     let randomCriteria = Math.floor(Math.random() * 4);
     if (randomCriteria === 0) {
-      temp = String.fromCharCode(
+      rand = String.fromCharCode(
         this.ASCIIupper[indexOne] -
           Math.floor(Math.random() * this.ASCIIspread[indexOne])
       );
-      this.password.push(temp);
-      console.log(temp);
+      this.password.push(rand);
     } else if (randomCriteria === 1) {
-      temp = String.fromCharCode(
+      rand = String.fromCharCode(
         this.ASCIIupper[indexTwo] -
           Math.floor(Math.random() * this.ASCIIspread[indexTwo])
       );
-      this.password.push(temp);
-      console.log(temp);
+      this.password.push(rand);
     } else if (randomCriteria === 2) {
-      temp = String.fromCharCode(
+      rand = String.fromCharCode(
         this.ASCIIupper[indexThree] -
           Math.floor(Math.random() * this.ASCIIspread[indexThree])
       );
-      this.password.push(temp);
-      console.log(temp);
+      this.password.push(rand);
     } else if (randomCriteria === 3) {
-      temp = String.fromCharCode(
+      rand = String.fromCharCode(
         this.ASCIIupper[indexFour] -
           Math.floor(Math.random() * this.ASCIIspread[indexFour])
       );
-      this.password.push(temp);
-      console.log(temp);
+      this.password.push(rand);
     }
   },
   generate: function () {
-    console.log(this.index);
     if (this.index === 1) {
       for (let i = 0; i < this.inputLength; i++) {
         this.generateOne();
@@ -261,17 +262,19 @@ var passwordGenerator = {
       }
     }
   },
-};
-
-// container for criteria questions, displayed after begin is clicked
-var criteriaContainer = {
-  formContainerEl: document.createElement("div"),
-  constructor: function () {
-    this.formContainerEl.setAttribute("class", "criteria-container");
+  clear: function () {
+    this.password.length = 0;
+    this.inputLength = 0;
+    this.lower = false;
+    this.upper = false;
+    this.alpha = false;
+    this.numeric = false;
+    this.special = false;
+    this.ASCIIupper.length = 0;
+    this.ASCIIspread.length = 0;
+    this.index = 0;
   },
 };
-criteriaContainer.constructor();
-console.log(criteriaContainer.formContainerEl);
 
 var getLength = function () {
   criteriaContainer.formContainerEl.append(criteriaLength.divLengthEl);
@@ -310,10 +313,26 @@ var getCharacters = function () {
   criteriaContainer.formContainerEl.append(criteriaCharacters.divCharEl);
 };
 
+var clearElements = function () {
+  criteriaLength.inputLengthEl.value = "";
+  criteriaCase.inputLowerEl.checked = false;
+  criteriaCase.inputUpperEl.checked = false;
+  criteriaCharacters.inputAlphaEl.checked = false;
+  criteriaCharacters.inputNumEl.checked = false;
+  criteriaCharacters.inputSpecialEl.checked = false;
+};
+
 // Write password to the #password input
 var steps = 1;
 var getCriteria = function (event) {
   event.preventDefault();
+  if (beginEl.innerText === "Clear") {
+    clearElements();
+    passwordGenerator.clear();
+    passwordText.value = "";
+    beginEl.textContent = "Begin";
+    return;
+  }
   if (steps === 1) {
     beginEl.textContent = "Submit";
     steps++;
@@ -337,15 +356,13 @@ var getCriteria = function (event) {
     criteriaContainer.formContainerEl.remove();
     generatePassword();
     steps = 1;
-    beginEl.textContent = "Begin";
+    beginEl.textContent = "Clear";
   }
 };
 var generatePassword = function () {
   passwordGenerator.setValues();
   passwordGenerator.determineOptions();
   passwordGenerator.generate();
-  var passwordText = document.querySelector("#password");
-  console.log(passwordGenerator.password.join(""));
   passwordText.value = passwordGenerator.password.join("");
 };
 

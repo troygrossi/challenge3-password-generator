@@ -15,4 +15,4 @@
 
 Link: https://troygrossi.github.io/challenge3-password-generator/
 
-Screenshot: <img src="./develop/images/screenshot.png" />
+Screenshot: <img src="./Develop/images/screenshot.png" />
